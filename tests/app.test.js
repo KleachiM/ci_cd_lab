@@ -15,3 +15,14 @@ describe('Greet function', () => {
         expect(greet('World')).toBe('Hello, World!');
     });
 })
+describe('Additional math functions', () => {
+    test('subtracts 5 - 3 to equal 2', () => {
+        expect(subtract(5, 3)).toBe(2);
+    });
+    test('divides 10 / 2 to equal 5', () => {
+        expect(divide(10, 2)).toBe(5);
+    });
+    test('throws error on division by zero', () => {
+        expect(() => divide(10, 0)).toThrow('Division by zero');
+    });
+});
