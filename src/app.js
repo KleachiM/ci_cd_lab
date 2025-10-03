@@ -19,7 +19,10 @@ function divide(a, b) {
     }
     return a / b;
 }
-module.exports = { add, multiply, greet, subtract, divide };
+function power(base, exponent) {
+    return Math.pow(base, exponent);
+}
+module.exports = { add, multiply, greet, subtract, divide, power };
 if (require.main === module) {
     console.log('Application started!');
     console.log('2 + 3 =', add(2, 3));
