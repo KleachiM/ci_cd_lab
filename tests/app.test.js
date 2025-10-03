@@ -7,7 +7,7 @@ describe('Math functions', () => {
         expect(multiply(4, 5)).toBe(20);
     });
     test('should fail this test initially', () => {
-        expect(add(1, 1)).toBe(3); // Специально неверный тест
+        expect(add(1, 1)).toBe(2); // Специально неверный тест
     });
 });
 describe('Greet function', () => {
