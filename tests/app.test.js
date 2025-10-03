@@ -15,3 +15,8 @@ describe('Greet function', () => {
         expect(greet('World')).toBe('Hello, World!');
     });
 })
+describe('Power function', () => {
+    test('calculates 2^3 to equal 8', () => {
+        expect(power(2, 3)).toBe(8);
+    });
+});
