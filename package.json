@@ -1,0 +1,16 @@
+{
+  "name": "git-cicd-lab",
+  "version": "1.0.0",
+  "description": "Lab project for Git and CI/CD",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "test": "jest",
+    "build": "echo 'Building application...'",
+    "lint": "echo 'Linting code...'"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0"
+  }
+}
+
