@@ -1,28 +1,26 @@
-const { add, multiply, greet, subtract, divide, power } = require('../src/app');
-describe('Math functions', () => {
-    test('adds 2 + 3 to equal 5', () => {
-        expect(add(2, 3)).toBe(5);
-    });
-    test('multiplies 4 * 5 to equal 20', () => {
-        expect(multiply(4, 5)).toBe(20);
-    });
-    test('should fail this test initially', () => {
-        expect(add(1, 1)).toBe(2); // Специально неверный тест
-    });
-});
-describe('Greet function', () => {
-    test('greets user correctly', () => {
-        expect(greet('World')).toBe('Hello, World!');
-    });
-})
-describe('Additional math functions', () => {
-    test('subtracts 5 - 3 to equal 2', () => {
-        expect(subtract(5, 3)).toBe(2);
-    });
-    test('divides 10 / 2 to equal 5', () => {
-        expect(divide(10, 2)).toBe(5);
-    });
-    test('throws error on division by zero', () => {
-        expect(() => divide(10, 0)).toThrow('Division by zero');
-    });
+const { Cache } = require('../src/cache');
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+describe('Cache', () => {
+  test('stores and retrieves values', () => {
+    const cache = new Cache({ defaultTtlMs: 1_000 });
+    cache.set('foo', 'bar');
+    expect(cache.get('foo')).toBe('bar');
+  });
+
+  test('expires values based on ttl', async () => {
+    const cache = new Cache({ defaultTtlMs: 50 });
+    cache.set('expiring', 'value', 30);
+    expect(cache.get('expiring')).toBe('value');
+    await sleep(40);
+    expect(cache.get('expiring')).toBeUndefined();
+  });
+
+  test('supports manual eviction', () => {
+    const cache = new Cache({ defaultTtlMs: 1_000 });
+    cache.set('key', 'value');
+    cache.delete('key');
+    expect(cache.has('key')).toBe(false);
+  });
 });

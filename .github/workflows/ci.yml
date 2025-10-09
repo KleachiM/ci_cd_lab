@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [ 16.x, 18.x, 20.x ]
+        node-version: [16.x, 18.x, 20.x]
 
     steps:
       - name: Checkout code
@@ -20,12 +20,11 @@ jobs:
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-        node-version: ${{ matrix.node-version }}
-        cache: ''
+          node-version: ${{ matrix.node-version }}
+          cache: npm
 
       - name: Install dependencies
-        run: |
-          npm install
+        run: npm install
 
       - name: Run linter
         run: npm run lint
@@ -33,28 +32,39 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Test HTTP client
+        env:
+          MOCK_SERVER_PORT: 4000
+          MOCK_SERVER_URL: http://127.0.0.1:4000
+        run: |
+          node tests/mockServer.js &
+          MOCK_PID=$!
+          trap "kill $MOCK_PID" EXIT
+          sleep 1
+          npm run test:http-client
+
       - name: Build application
         run: npm run build
 
-docker-build:
-  needs: test
-  runs-on: ubuntu-latest
-  if: github.ref == 'refs/heads/main'
+  docker-build:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
 
-  steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Build and test Docker image
-      run: docker build --target test -t git-cicd-lab:test .
+      - name: Build and test Docker image
+        run: docker build --target test -t git-cicd-lab:test .
 
-    - name: Build production Docker image
-      run: docker build --target production -t git-cicd-lab:latest .
+      - name: Build production Docker image
+        run: docker build --target production -t git-cicd-lab:latest .
 
-    - name: Test production image startup
-      run: |
-        docker run -d --name test-container git-cicd-lab:latest
-        sleep 5
-        docker logs test-container
-        docker stop test-container
-        docker rm test-container
+      - name: Test production image startup
+        run: |
+          docker run -d --name test-container git-cicd-lab:latest
+          sleep 5
+          docker logs test-container
+          docker stop test-container
+          docker rm test-container
