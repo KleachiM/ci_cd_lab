@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [ 16.x, 18.x, 20.x ]
+        node-version: [16.x, 18.x, 20.x]
 
     steps:
       - name: Checkout code
@@ -24,14 +24,24 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          npm install
+        run: npm install
 
       - name: Run linter
         run: npm run lint
 
       - name: Run tests
         run: npm test
+
+      - name: Test HTTP client
+        env:
+          MOCK_SERVER_PORT: 4000
+          MOCK_SERVER_URL: http://127.0.0.1:4000
+        run: |
+          node tests/mockServer.js &
+          MOCK_PID=$!
+          trap "kill $MOCK_PID" EXIT
+          sleep 1
+          npm run test:http-client
 
       - name: Build application
         run: npm run build

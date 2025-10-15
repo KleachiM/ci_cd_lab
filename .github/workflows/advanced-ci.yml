@@ -24,7 +24,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: ''
+          cache: npm
 
       - name: Install dependencies
         run: npm install
@@ -33,8 +33,18 @@ jobs:
         run: npm run lint
 
       - name: Run tests with coverage
+        run: npm test -- --coverage --watchAll=false
+
+      - name: Test HTTP client
+        env:
+          MOCK_SERVER_PORT: 4000
+          MOCK_SERVER_URL: http://127.0.0.1:4000
         run: |
-          npm test -- --coverage --watchAll=false
+          node tests/mockServer.js &
+          MOCK_PID=$!
+          trap "kill $MOCK_PID" EXIT
+          sleep 1
+          npm run test:http-client
 
       - name: Upload coverage reports
         uses: actions/upload-artifact@v4
@@ -59,7 +69,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: ''
+          cache: npm
 
       - name: Install dependencies
         run: npm install
@@ -69,6 +79,17 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+      - name: Test HTTP client
+        env:
+          MOCK_SERVER_PORT: 4000
+          MOCK_SERVER_URL: http://127.0.0.1:4000
+        run: |
+          node tests/mockServer.js &
+          MOCK_PID=$!
+          trap "kill $MOCK_PID" EXIT
+          sleep 1
+          npm run test:http-client
 
   docker-operations:
     needs: [quality-checks, build-and-test]
